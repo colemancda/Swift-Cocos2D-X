@@ -17,11 +17,7 @@ open class Node: CustomStringConvertible {
     
     public final private(set) var children = [Node]()
     
-    public final weak var parent: Node? {
-        
-        @inline(__always)
-        didSet { __CCNodeSetParent(internalPointer, parent?.internalPointer) }
-    }
+    public final private(set) weak var parent: Node?
     
     // MARK: - Initialization
     
@@ -236,18 +232,49 @@ open class Node: CustomStringConvertible {
         return __CCNodeGetRunning(internalPointer)
     }
     
+    public final var boundingBox: Vector4 {
+        
+        return __CCNodeGetBoundingBox(internalPointer)
+    }
+    
+    /// Get parent scene
+    public final var scene: Scene? {
+        
+        // recusively get parent node
+        var parent: Node = self
+        var stop = false
+        repeat {
+            
+            if let newParent = parent.parent {
+                
+                parent = newParent
+                
+            } else {
+                
+                stop = true
+            }
+            
+        } while stop == false
+        
+        return parent as? Scene
+    }
+    
     // MARK: - Methods
     
-    @inline(__always)
     public final func add(child: Node) {
+        
+        // cannot add self recursively
+        assert(child !== self, "Cannot add self as child node")
+        
+        // cannot add same child twice
+        guard children.contains(where: { $0 === child }) == false else { return }
         
         __CCNodeAddChild(internalPointer, child.internalPointer)
         
-        children.append(child) // for ARC and keeping type information
+        children.append(child)
         child.parent = self
     }
     
-    @inline(__always)
     public final func remove(child: Node, cleanup: Bool = true) {
         
         guard let childIndex = children.index(where: { $0 === child })

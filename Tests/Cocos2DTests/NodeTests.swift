@@ -43,6 +43,9 @@ final class NodeTests: XCTestCase {
         
         // running
         XCTAssert(node.isRunning == false)
+        
+        // scene
+        XCTAssert(node.scene == nil)
     }
     
     func testChildren() {
@@ -61,6 +64,7 @@ final class NodeTests: XCTestCase {
             XCTAssert(node.children.first === childNode)
             XCTAssert(node.parent == nil)
             XCTAssert(childNode.parent === node)
+            XCTAssert(childNode.scene == nil)
             
             // get child
             XCTAssert(node[name: "child"] === childNode)
@@ -77,6 +81,12 @@ final class NodeTests: XCTestCase {
             node.remove(child: childNode)
             XCTAssert(childNode.parent == nil)
             XCTAssert(node.children.isEmpty)
+            
+            // cannot add child multiple times
+            node.add(child: childNode)
+            node.add(child: childNode)
+            
+            XCTAssert(node.children.count == 1)
         }
         
         
