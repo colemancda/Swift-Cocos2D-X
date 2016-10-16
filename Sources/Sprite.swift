@@ -14,6 +14,6 @@ open class Sprite: Node {
     
     public override init() {
         
-        //self.internalPointer = __CCSpriteCreate()
+        super.init(__CCSpriteCreate())
     }
 }

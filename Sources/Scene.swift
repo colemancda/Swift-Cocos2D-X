@@ -14,6 +14,8 @@ open class Scene: Node {
     
     public override init() {
         
-        //self.internalPointer = __CCSpriteCreate()
+        // TODO: Set to initialize with Scene pointer
+        // super.init(__CCSceneCreate())
+        super.init(__CCNodeCreate())
     }
 }

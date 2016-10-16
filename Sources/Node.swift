@@ -21,6 +21,14 @@ open class Node: CustomStringConvertible {
     
     // MARK: - Initialization
     
+    /// For internal subclasses to directly initialize the internal pointer.
+    @inline(__always)
+    internal init(_ pointer: UnsafeMutableRawPointer) {
+        
+        self.internalPointer = pointer
+    }
+    
+    /// Designated and overridable initializer for `Node`. 
     public init() {
         
         self.internalPointer = __CCNodeCreate()
