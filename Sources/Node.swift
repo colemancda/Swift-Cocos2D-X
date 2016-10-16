@@ -13,9 +13,15 @@ open class Node: CustomStringConvertible {
     
     // MARK: - Properties
     
-    internal var internalPointer: UnsafeMutableRawPointer
+    internal final var internalPointer: UnsafeMutableRawPointer
     
-    public final var children = [Node]()
+    public final private(set) var children = [Node]()
+    
+    public final weak var parent: Node? {
+        
+        @inline(__always)
+        didSet { __CCNodeSetParent(internalPointer, parent?.internalPointer) }
+    }
     
     // MARK: - Initialization
     
@@ -225,6 +231,11 @@ open class Node: CustomStringConvertible {
         set { __CCNodeSetTag(internalPointer, Int32(newValue)) }
     }
     
+    public final var isRunning: Bool {
+        
+        return __CCNodeGetRunning(internalPointer)
+    }
+    
     // MARK: - Methods
     
     @inline(__always)
@@ -233,29 +244,40 @@ open class Node: CustomStringConvertible {
         __CCNodeAddChild(internalPointer, child.internalPointer)
         
         children.append(child) // for ARC and keeping type information
+        child.parent = self
     }
     
     @inline(__always)
-    public final func add(child: Node, localZOrder: Int) {
+    public final func remove(child: Node, cleanup: Bool = true) {
         
-        __CCNodeAddChildWithLocalZOrder(internalPointer, child.internalPointer, Int32(localZOrder))
+        guard let childIndex = children.index(where: { $0 === child })
+            else { return }
         
-        children.append(child) // for ARC and keeping type information
+        __CCNodeRemoveChild(internalPointer, child.internalPointer, cleanup)
+        
+        self.children.remove(at: childIndex)
+        child.parent = nil
     }
     
     @inline(__always)
-    public final func add(child: Node, localZOrder: Int, tag: Int) {
+    public final func removeFromParent(cleanup: Bool = true) {
         
-        __CCNodeAddChildWithLocalZOrderAndTag(internalPointer, child.internalPointer, Int32(localZOrder), Int32(tag))
-        
-        children.append(child) // for ARC and keeping type information
+        self.parent?.remove(child: self, cleanup: cleanup)
     }
     
-    @inline(__always)
-    public final func add(child: Node, localZOrder: Int, name: String) {
+    // MARK: - Subscripting
+    
+    /// Get child by tag.
+    public final subscript(tag tag: Int) -> Node? {
         
-        __CCNodeAddChildWithLocalZOrderAndName(internalPointer, child.internalPointer, Int32(localZOrder), name)
+        // TODO: Optimize to use C API and get child instance by comparing `internalPointer`
+        return children.first(where: { $0.tag == tag })
+    }
+    
+    /// Get child by tag.
+    public final subscript(name name: String) -> Node? {
         
-        children.append(child) // for ARC and keeping type information
+        // TODO: Optimize to use C API and get child instance by comparing `internalPointer`
+        return children.first(where: { $0.name == name })
     }
 }

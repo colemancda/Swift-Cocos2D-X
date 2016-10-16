@@ -40,6 +40,9 @@ final class NodeTests: XCTestCase {
         let name = "My Node"
         node.name = name
         XCTAssert(node.name == name)
+        
+        // running
+        XCTAssert(node.isRunning == false)
     }
     
     func testChildren() {
@@ -56,6 +59,24 @@ final class NodeTests: XCTestCase {
             
             XCTAssert(node.children.count == 1)
             XCTAssert(node.children.first === childNode)
+            XCTAssert(node.parent == nil)
+            XCTAssert(childNode.parent === node)
+            
+            // get child
+            XCTAssert(node[name: "child"] === childNode)
+            
+            // remove from parent
+            childNode.removeFromParent()
+            XCTAssert(childNode.parent == nil)
+            XCTAssert(node.children.isEmpty)
+            
+            // add again
+            node.add(child: childNode)
+            
+            // remove child
+            node.remove(child: childNode)
+            XCTAssert(childNode.parent == nil)
+            XCTAssert(node.children.isEmpty)
         }
         
         
