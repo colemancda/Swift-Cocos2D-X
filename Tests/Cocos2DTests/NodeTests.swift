@@ -44,14 +44,20 @@ final class NodeTests: XCTestCase {
     
     func testChildren() {
         
-        let node = Node()
-        node.name = "parent"
+        do {
+            
+            let node = Node()
+            node.name = "parent"
+            
+            let childNode = Node()
+            childNode.name = "child"
+            
+            node.add(child: childNode)
+            
+            XCTAssert(node.children.count == 1)
+            XCTAssert(node.children.first === childNode)
+        }
         
-        let childNode = Node()
-        childNode.name = "child"
         
-        node.add(child: node)
-        
-        XCTAssert(node.children.count == 1)
     }
 }
