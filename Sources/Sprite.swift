@@ -16,4 +16,12 @@ open class Sprite: Node {
         
         super.init(__CCSpriteCreate())
     }
+    
+    public init?(filename: String) {
+        
+        guard let pointer = __CCSpriteCreateWithFilename(filename)
+            else { return nil }
+        
+        super.init(pointer)
+    }
 }

@@ -21,6 +21,12 @@ open class Node: CustomStringConvertible {
     
     // MARK: - Initialization
     
+    deinit {
+        
+        // release reference
+        
+    }
+    
     /// For internal subclasses to directly initialize the internal pointer.
     @inline(__always)
     internal init(_ pointer: UnsafeMutableRawPointer) {
